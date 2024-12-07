@@ -56,12 +56,14 @@ def StartScanning():
 
 debug=0
 def IconifyCallBack(event):
+    # print("視窗最小化")
     print(MinimizeWhenScanning.get() , Scanning,window.wm_state())
     global debug
     if MinimizeWhenScanning.get() and Scanning and window.state()=='iconic':
         Iconify.minimize_to_tray(window,SaveQuit)
         debug=1
 def DeIconifyCallBack(event):
+    # print("視窗恢復")
     global debug
     debug=0
 
@@ -72,6 +74,7 @@ def AutoStartCheck():
     else:
         AutoStart.remove_startup_item("NcuNetLimiter.exe")
 
+# 讀取先前得設定檔
 def ReadConfigs():
     try:
         with open(Info.GetConfigspath(), 'r') as file:
@@ -98,17 +101,17 @@ window = tk.Tk()
 window.title('NcuNetLimiter')
 window.iconbitmap(Info.GetIconpath())
 window.geometry('455x260')
+
+# 建立功能表(menubar)，名稱為help_
 menubar = tk.Menu()
-#edit = tk.Menu(menubar, tearoff=0)
-#menubar.add_cascade(label='Settings', menu=edit)
-#edit.add_command(label='設定報警筏值', command=Settings.__init__)
-#edit.add_command(label='設定開機自起動', command=None)
 help_ = tk.Menu(menubar, tearoff=0)
 menubar.add_cascade(label='Help', menu=help_)
 help_.add_command(label='關於此程式', command=lambda:webbrowser.open("https://github.com/stue1202/NcuNetLimiter"))
 help_.add_separator()
 help_.add_command(label='版本號:%s'%Info.Version)
-window.config(menu=menubar)
+window.config(menu=menubar) # 添加到視窗上
+
+# 設定列表
 Setting = tk.LabelFrame(window,text='設定')
 label = tk.Label(Setting, text="輸入你的IP")
 YourIp = tk.Entry(Setting,width=15)
@@ -116,17 +119,26 @@ Log = tk.Text(window, height=15, width=30)
 ScanButton = tk.Button(window, text="開始偵測", command=StartScanning)
 StopScanButton=tk.Button(window, text="停止偵測", command=StopScanning)
 label2=tk.Label(Setting,text="報警閥值(GB)")
+
+# 設定IsAutoStart、MinimizeWhenScanning為變數型態
 IsAutoStart=tk.IntVar()
 MinimizeWhenScanning=tk.IntVar()
+
+# 讀取先前存的IP和Limit的資料
 Ip,Limit=ReadConfigs()
 
+# 綁定Checkbutton
 AutoStartScanButton=tk.Checkbutton(Setting,text='開機自動掃描',command=AutoStartCheck,variable=IsAutoStart)
 MinimizeWhenScanningButton=tk.Checkbutton(Setting,text='掃描時最小化到托盤',command=UpdateConfig,variable=MinimizeWhenScanning)
+
+# 設定警告值輸入框
 TrafficMaxValue=tk.Entry(Setting,width=15)
+
+# 設定按鈕狀態
 StopScanButton['state']=tk.DISABLED
 ScanButton['state']=tk.ACTIVE
 
-
+# 將先前存好的資料自動填入輸入框中
 YourIp.insert(0,Ip)
 TrafficMaxValue.insert(0,Limit)
 
@@ -141,11 +153,10 @@ MinimizeWhenScanningButton.grid(column=0,row=4,pady=5,columnspan=2)
 ScanButton.grid(column=1,row=2)
 StopScanButton.grid(column=0,row=2)
 
-
+# 若有先設定自動開始，就會直接自動開始掃描
 if IsAutoStart.get():
     StartScanning()
 window.bind("<Unmap>", IconifyCallBack)
 window.bind("<Map>", DeIconifyCallBack)
-#window.protocol("WM_DELETE_WINDOW", Qt)
 window.resizable(False, False)
 window.mainloop()
