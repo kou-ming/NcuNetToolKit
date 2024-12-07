@@ -10,7 +10,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
 from tkinter import messagebox
 import Info
-import tkinter as TK
+import tkinter as tk
 # 全局變數
 YourIP = ''
 stop_scanning = False
@@ -31,7 +31,7 @@ def GetTraffic():
     SendIp = driver.find_element(By.XPATH, "/html/body/table/tbody/tr[2]/td/table/tbody/tr[1]/td[2]/form/table/tbody/tr/td/table/tbody/tr[3]/td/input[2]")
     SendIp.click()
     print("b")
-    # 获取上传总量
+    # 獲取總上傳量
     TotoalUpload = WebDriverWait(driver, 10).until(
         EC.presence_of_element_located((By.XPATH, "/html/body/table/tbody/tr[2]/td/table/tbody/tr[1]/td[2]/form/table/tbody/tr/td/table/tbody/tr[3]/td/table/tbody/tr[3]/td[2]"))
     )
@@ -51,7 +51,9 @@ def RunCrawl():
         # 等待 IP 输入框元素加载完成
         global Traffic
         Traffic=GetTraffic()
-        Ins(End, f'上傳流量共%sGB   %s\n'%(Traffic,GetTime()))
+        Ins.config(state=tk.NORMAL)
+        Ins.insert(End, f'上傳流量共%sGB   %s\n'%(Traffic,GetTime()))
+        Ins.config(state=tk.DISABLED)
         if float(Traffic)>=float(Max):
             #if window !="normal":
             #    Notify.notify(f"超出設定上傳流量%s"%Max, f'上傳流量共%sGB   %s'%(Traffic,GetTime()))
@@ -71,15 +73,17 @@ def run_scheduler():
         scheduler.run_pending()
         time.sleep(30)  # 避免占用过多 CPU
 
-def StartDetect(TextBoxInsert, TextBoxEnd, MyIp, MaxTrafficValue,WindowState):
+def StartDetect(TextBox, TextBoxEnd, MyIp, MaxTrafficValue,WindowState):
     global thread, YourIP, Ins, End, Max,stop_scanning,window,driver,Traffic
     Traffic='尚未開始偵測'
-    Ins = TextBoxInsert
+    Ins = TextBox
     End = TextBoxEnd
     Max = MaxTrafficValue
     YourIP = MyIp
     window=WindowState
-    Ins(End, "開始偵測 " + YourIP + "\n")
+    Ins.config(state=tk.NORMAL)
+    Ins.insert(End, "開始偵測 " + YourIP + "\n")
+    Ins.config(state=tk.DISABLED)
     stop_scanning = False  # 重置停止標誌
     thread = threading.Thread(target=run_scheduler, daemon=True)
     thread.start()
@@ -88,6 +92,8 @@ def StopScanning():
     global stop_scanning
     stop_scanning = True  # 設置停止標誌
     thread.join()  # 等待線程結束
-    Ins(End, "停止偵測\n")  # 顯示停止訊息
+    Ins.config(state=tk.NORMAL)
+    Ins.insert(End, "停止偵測\n")  # 顯示停止訊息
+    Ins.config(state=tk.DISABLED)
 
     
