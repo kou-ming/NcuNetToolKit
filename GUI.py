@@ -108,7 +108,20 @@ def ReadConfigs():
             return Ip,Limit
 
 def Open_helper():
-    Helper.new_task_window()
+    # 創造新的視窗
+    new_window = Helper.Create_new_window(window)
+
+    # 關閉掃描鈕
+    ScanButton['state'] = tk.DISABLED
+
+    # 設置子視窗與主視窗的關係
+    new_window.transient(window)
+    new_window.grab_set()
+    window.wait_window(new_window)
+
+    ScanButton['state'] = tk.ACTIVE
+    print("小幫手關閉")
+
 
 window = tk.Tk()
 window.title('NcuNetLimiter')
