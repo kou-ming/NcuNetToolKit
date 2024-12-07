@@ -7,6 +7,8 @@ import AutoStart
 import os,sys
 import Iconify,Info
 
+import Helper
+
 Scanning=False
 
 def SaveQuit():
@@ -105,6 +107,9 @@ def ReadConfigs():
             Limit="2.5"
             return Ip,Limit
 
+def Open_helper():
+    Helper.new_task_window()
+
 window = tk.Tk()
 window.title('NcuNetLimiter')
 window.iconbitmap(Info.GetIconpath())
@@ -127,6 +132,10 @@ Log = tk.Text(window, height=15, width=30, state=tk.DISABLED)
 ScanButton = tk.Button(window, text="開始偵測", command=StartScanning)
 StopScanButton=tk.Button(window, text="停止偵測", command=StopScanning)
 label2=tk.Label(Setting,text="報警閥值(GB)")
+
+# 小幫手呼叫鈕
+HelperButton = tk.Button(window, text="宿網小幫手", command=Open_helper)
+
 
 # 設定IsAutoStart、MinimizeWhenScanning為變數型態
 IsAutoStart=tk.IntVar()
@@ -160,6 +169,8 @@ AutoStartScanButton.grid(column=0,row=2,pady=5,columnspan=2)
 MinimizeWhenScanningButton.grid(column=0,row=4,pady=5,columnspan=2)
 ScanButton.grid(column=1,row=2)
 StopScanButton.grid(column=0,row=2)
+HelperButton.grid(column=2,row=2)
+
 
 # 若有先設定自動開始，就會直接自動開始掃描
 if IsAutoStart.get():
