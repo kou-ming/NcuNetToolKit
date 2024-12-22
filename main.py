@@ -40,6 +40,7 @@ def StopScanning():
     ScanButton['state']=tk.ACTIVE
     YourIp['state']=tk.NORMAL
     TrafficMaxValue['state']=tk.NORMAL
+    HelperButton['state'] = tk.NORMAL
 
 # 開始檢測流量    
 def StartScanning():
@@ -58,6 +59,7 @@ def StartScanning():
         TrafficMaxValue['state']=tk.DISABLED
         StopScanButton['state']=tk.ACTIVE
         ScanButton['state']=tk.DISABLED
+        HelperButton['state'] = tk.DISABLED
         Crwal.StartDetect(Log,'1.0',YourIp.get(),TrafficMaxValue.get(),window.wm_state)
     else:
         Scanning=False
@@ -124,7 +126,7 @@ def Open_helper():
 
 
 window = tk.Tk()
-window.title('NcuNetLimiter')
+window.title('NcuNetToolKit')
 window.iconbitmap(Info.GetIconpath())
 window.geometry('455x260')
 
@@ -132,8 +134,6 @@ window.geometry('455x260')
 menubar = tk.Menu()
 help_ = tk.Menu(menubar, tearoff=0)
 menubar.add_cascade(label='Help', menu=help_)
-help_.add_command(label='關於此程式', command=lambda:webbrowser.open("https://github.com/stue1202/NcuNetLimiter"))
-help_.add_separator()
 help_.add_command(label='版本號:%s'%Info.Version)
 window.config(menu=menubar) # 添加到視窗上
 

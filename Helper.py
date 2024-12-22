@@ -12,7 +12,9 @@ text_dict = {}
 img_dict = {}
 btn_dict = {}
 Macaddr = ''
+exit_button_list = []
 
+# 讀取文件，存成字典
 def create_dict():
     output_file_path = os.path.join(os.path.dirname(__file__),"helper.txt")
     with open(output_file_path, "r", encoding="utf-8") as file:
@@ -40,16 +42,41 @@ def _on_mouse_wheel(event):
     global chat_canvas
     chat_canvas.yview_scroll(-1 * int(event.delta / 120), "units")  # 滾動速度調整為 120 單位
 
+# 計算文字輸出框要多高
+def count_line(text, letter_num):
+    text_line = (text.count("\n") + 1)
+    count = 0
+    for tx in text:
+        if(tx == "\n"):
+            count = 0
+            continue
+        count += 1
+        if count == letter_num:
+            text_line += 1
+            count = 0
+    return text_line
+
 def add_message(text, image_list=None, btn_list=None):
     global chat_frame
-    frame = tk.Frame(chat_frame)
+
+    # 將之前的按鈕無效化
+    global exit_button_list
+    for butn in exit_button_list:
+        butn['state'] = tk.DISABLED
+        # print(butn)
+    exit_button_list.clear()
+
+    frame = tk.Frame(chat_frame, bg="#F7F7F7", padx=5, pady=5, relief="raised", borderwidth=1)
+
+    # print(text.count("\n") + 1)
 
     # 顯示文字訊息
-    # msg_text = tk.Text(frame, height=4, wrap='word', font=(13))
-    # msg_text.insert('1.0', text)
-    # msg_text.pack(fill='x', side='top', anchor='w', padx=5, pady=5)
-    msg_label = tk.Label(frame, text=text, font=(12), wraplength=300, anchor='w')
-    msg_label.pack(side='top', anchor='w', padx=5, pady=5)
+    text_line = count_line(text, 25)
+    msg_text = tk.Text(frame, height=text_line, width=8, wrap="word", font=("Arial", 12), bg="#CAFFFF", fg="#333333", relief="flat", padx=10, pady=10)
+    msg_text.insert("1.0", text)
+    msg_text.config(state="disabled")  # 禁止編輯
+    msg_text.pack(fill="x", pady=5)
+
 
 
     for image_path in image_list:  
@@ -60,20 +87,28 @@ def add_message(text, image_list=None, btn_list=None):
             img = Image.open(image_path)
             img.thumbnail((350, 350))
             img = ImageTk.PhotoImage(img)
-            img_label = tk.Label(frame, image=img)
+            img_label = tk.Label(frame, image=img, bg="#F7F7F7")
             img_label.image = img  # 保持對圖片的引用
             img_label.pack(side='top', anchor='w', padx=5, pady=5)
 
 
-    button_row = 0
-    button_col = 0
     # 如果有按鈕文字，則添加按鈕
     for button_text in btn_list:
         if button_text != "None":
-            button = tk.Button(frame, text=button_text, command=lambda btn_text=button_text: send_message(btn_text))
+            button = tk.Button(
+                frame, 
+                text=button_text, 
+                command=lambda btn_text=button_text: send_message(btn_text),
+                bg="#000093", 
+                fg="white", 
+                font=("Arial", 10), 
+                relief="flat", 
+                activebackground="#000079",
+                padx=5, 
+                pady=3
+            )
             button.pack(side='left', anchor='w', padx=5, pady=5)
-            # button.grid(row=button_row, column=button_col, padx=5, pady=5)
-            # button_col += 1
+            exit_button_list.append(button)
 
     frame.pack(fill='x', padx=5, pady=5)  # 將框架添加到聊天區塊
     global chat_canvas
@@ -107,10 +142,10 @@ def Create_new_window(main_window):
     chat_canvas.configure(scrollregion=(0, 0, 400, 350))  # 固定大小為 400x350
 
 
-    # add_message("歡迎來到宿網疑難雜症小幫手\n請問你需要什麼協助?", None, None)
-    # macaddr = get_macaddr.get_MacAddr()
-    # add_message("haha", None, None)
+
     create_dict()
+    global exit_button_list
+    exit_button_list.clear()
     send_message('返回選單')
     # send_button = tk.Button(window, text="發送", command=lambda: add_message("test\ntest\n", "img/image.png"))
     # send_button.pack(side='left', padx=5, pady=5)

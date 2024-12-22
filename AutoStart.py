@@ -3,7 +3,7 @@ import winreg
 import os
  
 # 取得當前使用者的啟動項註冊表路徑
-startup_reg_path = r"Software\Microsoft\Windows\CurrentVersion\Run"
+startup_reg_path = r"Software\\Microsoft\\Windows\\CurrentVersion\\Run"
 startup_reg_key = winreg.HKEY_CURRENT_USER
 
 def add_startup_item(file_path):
