@@ -7,47 +7,50 @@ import queue
 import time
 from PIL import Image, ImageTk
 import os
+import Info
 
-text_dict = {}
-img_dict = {}
-btn_dict = {}
-Macaddr = ''
-exit_button_list = []
+text_dict = {}  # 用來存儲文字訊息的字典
+img_dict = {}  # 用來存儲圖片路徑的字典
+btn_dict = {}  # 用來存儲按鈕文字的字典
+Macaddr = ''  # 存儲 Mac 地址
+exit_button_list = []  # 存儲現有按鈕的列表
 
-# 讀取文件，存成字典
+# 讀取文件，將內容存成字典
 def create_dict():
-    output_file_path = os.path.join(os.path.dirname(__file__),"helper.txt")
-    with open(output_file_path, "r", encoding="utf-8") as file:
+    # 取得輔助檔案的路徑
+    helper_file_path = Info.GetHelperTxT()
+    with open(helper_file_path, "r", encoding="utf-8") as file:
         for line in file.read().split('}}'):    
             token_list = line.strip().split('}')
-            if(len(token_list) < 4):
+            if len(token_list) < 4:
                 break
-            text_dict[token_list[0]] = token_list[1]
-            img_dict[token_list[0]] = token_list[2].split(',')
-            btn_dict[token_list[0]] = token_list[3].split(',')
-    # print(btn_dict)
+            text_dict[token_list[0]] = token_list[1]  # 文字內容
+            img_dict[token_list[0]] = token_list[2].split(',')  # 圖片路徑
+            btn_dict[token_list[0]] = token_list[3].split(',')  # 按鈕文字
 
+# 發送消息，根據指令執行相應操作
 def send_message(cmd):
     print(cmd)
     if cmd == "自己電腦":
         global Macaddr
         if Macaddr == '':
-            Macaddr = get_macaddr.get_MacAddr()
-        messagebox.showinfo("MacAddress", "你的Mac Address為: " + Macaddr)
+            Macaddr = get_macaddr.get_MacAddr()  # 取得 Mac 地址
+        messagebox.showinfo("MacAddress", "你的 Mac Address 為: " + Macaddr)
         add_message(text_dict["使用注意事項"], img_dict["使用注意事項"], btn_dict["使用注意事項"])
     else:
         add_message(text_dict[cmd], img_dict[cmd], btn_dict[cmd])
 
+# 滑鼠滾輪滾動事件
 def _on_mouse_wheel(event):
     global chat_canvas
     chat_canvas.yview_scroll(-1 * int(event.delta / 120), "units")  # 滾動速度調整為 120 單位
 
-# 計算文字輸出框要多高
+# 計算文字輸出框需要的高度
 def count_line(text, letter_num):
-    text_line = (text.count("\n") + 1)
+    text_line = (text.count("\n") + 1)  # 計算換行符號的數量
     count = 0
     for tx in text:
-        if(tx == "\n"):
+        if tx == "\n":
             count = 0
             continue
         count += 1
@@ -56,43 +59,38 @@ def count_line(text, letter_num):
             count = 0
     return text_line
 
+# 添加聊天訊息
 def add_message(text, image_list=None, btn_list=None):
     global chat_frame
 
-    # 將之前的按鈕無效化
+    # 禁用之前的按鈕
     global exit_button_list
     for butn in exit_button_list:
-        butn['state'] = tk.DISABLED
-        # print(butn)
+        butn['state'] = tk.DISABLED  # 禁用按鈕
     exit_button_list.clear()
 
     frame = tk.Frame(chat_frame, bg="#F7F7F7", padx=5, pady=5, relief="raised", borderwidth=1)
 
-    # print(text.count("\n") + 1)
-
     # 顯示文字訊息
-    text_line = count_line(text, 25)
+    text_line = count_line(text, 25)  # 計算所需高度
     msg_text = tk.Text(frame, height=text_line, width=8, wrap="word", font=("Arial", 12), bg="#CAFFFF", fg="#333333", relief="flat", padx=10, pady=10)
     msg_text.insert("1.0", text)
     msg_text.config(state="disabled")  # 禁止編輯
     msg_text.pack(fill="x", pady=5)
 
-
-
+    # 顯示圖片
     for image_path in image_list:  
         if image_path != "None":
-            # print("have IMg")
             script_dir = os.path.dirname(__file__)
             image_path = os.path.join(script_dir, image_path)
             img = Image.open(image_path)
-            img.thumbnail((350, 350))
+            img.thumbnail((350, 350))  # 縮放圖片
             img = ImageTk.PhotoImage(img)
             img_label = tk.Label(frame, image=img, bg="#F7F7F7")
             img_label.image = img  # 保持對圖片的引用
             img_label.pack(side='top', anchor='w', padx=5, pady=5)
 
-
-    # 如果有按鈕文字，則添加按鈕
+    # 添加按鈕
     for button_text in btn_list:
         if button_text != "None":
             button = tk.Button(
@@ -115,7 +113,7 @@ def add_message(text, image_list=None, btn_list=None):
     chat_canvas.update_idletasks()
     chat_canvas.yview_moveto(1)  # 自動向下滾動到最新消息
 
-
+# 創建新窗口
 def Create_new_window(main_window):
     window = tk.Toplevel(main_window)
     window.title("宿網解惑小幫手")
@@ -133,21 +131,17 @@ def Create_new_window(main_window):
     chat_canvas.place(relx=0.6, y=0, anchor='n')
     chat_canvas.create_window((0, 0), window=chat_frame, anchor='nw')
     
-
+    # 滑鼠滾輪綁定事件
     chat_canvas.bind("<MouseWheel>", _on_mouse_wheel)  # Windows 和 Linux
     chat_canvas.bind("<Button-4>", lambda e: chat_canvas.yview_scroll(-1, "units"))  # macOS 向上
-    chat_canvas.bind("<Button-5>", lambda e: chat_canvas.yview_scroll(1, "units"))
+    chat_canvas.bind("<Button-5>", lambda e: chat_canvas.yview_scroll(1, "units"))  # macOS 向下
 
     chat_frame.bind("<Configure>", lambda e: chat_canvas.configure(scrollregion=chat_canvas.bbox("all")))
-    chat_canvas.configure(scrollregion=(0, 0, 400, 350))  # 固定大小為 400x350
+    chat_canvas.configure(scrollregion=(0, 0, 400, 350))  # 設置固定大小為 400x350
 
-
-
-    create_dict()
+    create_dict()  # 初始化字典
     global exit_button_list
     exit_button_list.clear()
-    send_message('返回選單')
-    # send_button = tk.Button(window, text="發送", command=lambda: add_message("test\ntest\n", "img/image.png"))
-    # send_button.pack(side='left', padx=5, pady=5)
+    send_message('返回選單')  # 預設顯示返回選單
 
     return window
