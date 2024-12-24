@@ -13,11 +13,11 @@ text_dict = {}  # 用來存儲文字訊息的字典
 img_dict = {}  # 用來存儲圖片路徑的字典
 btn_dict = {}  # 用來存儲按鈕文字的字典
 Macaddr = ''  # 存儲 Mac 地址
-exit_button_list = []  # 存儲現有按鈕的列表
+exit_button_list = []  # 存儲現有按鈕的list
 
 # 讀取文件，將內容存成字典
 def create_dict():
-    # 取得輔助檔案的路徑
+    # 取得helper檔案的路徑
     helper_file_path = Info.GetHelperTxT()
     with open(helper_file_path, "r", encoding="utf-8") as file:
         for line in file.read().split('}}'):    
@@ -28,9 +28,10 @@ def create_dict():
             img_dict[token_list[0]] = token_list[2].split(',')  # 圖片路徑
             btn_dict[token_list[0]] = token_list[3].split(',')  # 按鈕文字
 
-# 發送消息，根據指令執行相應操作
+# 發送消息，根據cmd執行相應操作
 def send_message(cmd):
     print(cmd)
+    # 如果cmd送過來是"自己電腦"則需要額外處理
     if cmd == "自己電腦":
         global Macaddr
         if Macaddr == '':
@@ -40,7 +41,7 @@ def send_message(cmd):
     else:
         add_message(text_dict[cmd], img_dict[cmd], btn_dict[cmd])
 
-# 滑鼠滾輪滾動事件
+# 滑鼠滾輪滾動設定
 def _on_mouse_wheel(event):
     global chat_canvas
     chat_canvas.yview_scroll(-1 * int(event.delta / 120), "units")  # 滾動速度調整為 120 單位
@@ -113,7 +114,7 @@ def add_message(text, image_list=None, btn_list=None):
     chat_canvas.update_idletasks()
     chat_canvas.yview_moveto(1)  # 自動向下滾動到最新消息
 
-# 創建新窗口
+# 創建新視窗
 def Create_new_window(main_window):
     window = tk.Toplevel(main_window)
     window.title("宿網解惑小幫手")

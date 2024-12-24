@@ -49,7 +49,7 @@ def GetTraffic():
         EC.presence_of_element_located((By.XPATH, "/html/body/table/tbody/tr[2]/td/table/tbody/tr[1]/td[2]/form/table/tbody/tr/td/table/tbody/tr[3]/td/table/tbody/tr[3]/td[2]"))
     )
     print("c")
-    # 使用正則表達式提取數據中的流量值
+    # 使用正規表達式提取數據中的流量值
     Traffic = re.findall(r'\d\.\d{1,2}', TotoalUpload.text)[0]
     return Traffic
 
