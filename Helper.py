@@ -50,6 +50,7 @@ def _on_mouse_wheel(event):
 def count_line(text, letter_num):
     text_line = (text.count("\n") + 1)  # 計算換行符號的數量
     count = 0
+    # 計算每超過幾個字就要加換行
     for tx in text:
         if tx == "\n":
             count = 0
@@ -60,7 +61,7 @@ def count_line(text, letter_num):
             count = 0
     return text_line
 
-# 添加聊天訊息
+# 添加訊息到輸出框
 def add_message(text, image_list=None, btn_list=None):
     global chat_frame
 
@@ -107,6 +108,7 @@ def add_message(text, image_list=None, btn_list=None):
                 pady=3
             )
             button.pack(side='left', anchor='w', padx=5, pady=5)
+            # 加進紀錄現在有什麼button的list裡
             exit_button_list.append(button)
 
     frame.pack(fill='x', padx=5, pady=5)  # 將框架添加到聊天區塊
@@ -120,6 +122,7 @@ def Create_new_window(main_window):
     window.title("宿網解惑小幫手")
     window.geometry("500x600")
 
+    # 設置聊天框，可以顯示資訊
     global chat_canvas
     chat_canvas = tk.Canvas(window, height=600, width=500)
     global chat_frame
